@@ -9,6 +9,7 @@ public class CurlSample {
 		}
 		System.out.println("\n");
 
+		CurlRequest request = new CurlRequest();
 		// 引数チェック
 		int maxArgs = args.length; // 引数の数
 		// １つずつ引数を調べる
@@ -42,6 +43,7 @@ public class CurlSample {
 			// 全てに当てはまらない時はURLと判断
 			else {
 				System.out.println("URLは " + args[i]);
+				request.requestURL(args[i]);
 			}
 		}
 	}
