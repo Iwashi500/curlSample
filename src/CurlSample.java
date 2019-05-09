@@ -1,10 +1,20 @@
 
 public class CurlSample {
 	public static void main(String[] args) {
-		int total = 0;
+
+		// 確認用
+		System.out.println("元の引数");
 		for (String string : args) {
-			total += Integer.parseInt(string);
+			System.out.print(string + " ");
 		}
-		System.out.println(total);
+		System.out.println("\n");
+
+		// 引数チェック
+		for (String string : args) {
+			if (string.equals("-o")) {
+				System.out.println("OK!");
+			}
+		}
+
 	}
 }
