@@ -18,18 +18,21 @@ public class CurlSample {
 			if (args[i].equals("-o")) {
 				System.out.println("引数は-o");
 				System.out.println("ファイル名は " + args[i + 1]);
+				request.setFile(args[i + 1]); // ファイルの作成フラグをセット
 				i++; // 次の引数はファイル名なので飛ばす
 			}
 
 			// 引数が -v の場合
 			else if (args[i].equals("-v")) {
 				System.out.println("引数は-v");
+				request.setHeader(); // ヘッダー受け取りフラグをセット
 			}
 
 			// 引数が -d の場合
 			else if (args[i].equals("-d")) {
 				System.out.println("引数は-d");
 				System.out.println("パラメータは " + args[i + 1]);
+				request.setPara(args[i + 1]); // パラメータをセット
 				i++; // 次はパラメータなので飛ばす
 			}
 
@@ -37,14 +40,18 @@ public class CurlSample {
 			else if (args[i].equals("-X")) {
 				System.out.println("引数は-X");
 				System.out.println("次は " + args[i + 1]);
+				request.setPost(); // ポスト要求フラグをセット
 				i++; // 次はPOSTなので飛ばす
 			}
 
 			// 全てに当てはまらない時はURLと判断
 			else {
 				System.out.println("URLは " + args[i]);
-				request.requestURL(args[i]);
+				request.setURL(args[i]);
 			}
+
+			//
+			request.requestURL();
 		}
 	}
 }
