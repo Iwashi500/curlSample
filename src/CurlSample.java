@@ -49,9 +49,8 @@ public class CurlSample {
 				System.out.println("URLは " + args[i]);
 				request.setURL(args[i]);
 			}
-
-			//
-			request.requestURL();
 		}
+		//
+		request.requestURL();
 	}
 }

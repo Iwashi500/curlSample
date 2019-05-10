@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
@@ -81,6 +84,11 @@ public class CurlRequest {
 			// ステップ6:レスポンスボディの読み出しを行う。
 			responseCode = urlConnection.getResponseCode();
 			responseData = convertToString(urlConnection.getInputStream());
+
+			// ファイル作成
+			if (fileFlag)
+				makeFile(responseData);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -89,10 +97,11 @@ public class CurlRequest {
 				urlConnection.disconnect();
 			}
 		}
-		System.out.println("");
-		System.out.println("URL:" + urlString);
-		System.out.println("httpStatusCode:" + responseCode);
-		System.out.println("responseData\n" + responseData);
+		// System.out.println("");
+		// System.out.println("URL:" + urlString);
+		// System.out.println("httpStatusCode:" + responseCode);
+		// System.out.println("responseData\n" + responseData);
+
 	}
 
 	// 受け取った内容をString型に変える
@@ -110,5 +119,17 @@ public class CurlRequest {
 			e.printStackTrace();
 		}
 		return sb.toString();
+	}
+
+	// ファイルを作成する
+	private void makeFile(String data) throws IOException {
+		// ファイル場所指定
+		FileWriter file = new FileWriter("/Users/iwaishingo/Desktop/" + this.fileName);
+		// ファイルに書き込むよう
+		PrintWriter pw = new PrintWriter(new BufferedWriter(file));
+		// ファイルに書き込む
+		pw.println(data);
+		// ファイルを閉じる
+		pw.close();
 	}
 }
