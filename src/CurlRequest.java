@@ -129,8 +129,6 @@ public class CurlRequest {
 					String headerKey = (String) headerIt.next();
 					header += headerKey + "：" + headers.get(headerKey) + "\r\n";
 				}
-				// 表示
-				System.out.println("ヘッダー受け取り完了 ON");
 				// 追加
 				responseData = addHeader(responseData, header);
 			}
@@ -149,7 +147,6 @@ public class CurlRequest {
 		}
 
 		// 表示
-		System.out.println("");
 		System.out.println("URL:" + urlString);
 		System.out.println("httpStatusCode:" + responseCode);
 		System.out.println("responseData\n" + responseData);
@@ -182,7 +179,7 @@ public class CurlRequest {
 	// ファイルを作成する
 	private void makeFile(String data) throws IOException {
 		// ファイル場所指定
-		FileWriter file = new FileWriter("/Users/iwaishingo/Desktop/" + this.fileName);
+		FileWriter file = new FileWriter("." + this.fileName);
 		// ファイルに書き込むよう
 		PrintWriter pw = new PrintWriter(new BufferedWriter(file));
 		// ファイルに書き込む
