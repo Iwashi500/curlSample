@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -12,19 +13,25 @@ import java.util.Locale;
 import java.util.Map;
 
 public class CurlRequest {
-	private String urlString; // アクセスするURL
+	private String urlString = null; // アクセスするURL
 	private boolean urlFlag = false; // URLセットフラグ
 	private boolean fileFlag = false; // ファイル作成フラグ
-	private String fileName; // 作成するファイルの名前
+	private String fileName = null; // 作成するファイルの名前
 	private boolean headerFlag = false; // ヘッダー受け取りフラグ
 	private boolean postFlag = false; // ポスト要求フラグ
 	private boolean paraFlag = false; // パラメータフラグ
-	private String paraString; // パラメータ内容
+	private String paraString = null; // パラメータ内容
 
 	// ファイル作成フラグとファイル名をセット
 	public void setFile(String name) {
-		this.fileFlag = true;
-		this.fileName = name;
+		if (fileName == null) {
+			this.fileFlag = true;
+			this.fileName = name;
+		} else {
+			// エラー
+			System.out.println("ファイル名が多いです");
+			System.exit(0); // 終了
+		}
 	}
 
 	// ヘッダー受け取りフラグをセット
@@ -39,14 +46,26 @@ public class CurlRequest {
 
 	// パラメータフラグとパラメータ内容をセット
 	public void setPara(String string) {
-		this.paraFlag = true;
-		this.paraString = string;
+		if (paraString == null) {
+			this.paraFlag = true;
+			this.paraString = string;
+		} else {
+			// エラー
+			System.out.println("パラメータが多いです");
+			System.exit(0); // 終了
+		}
 	}
 
-	// ファイル作成フラグとファイル名をセット
+	// URLとURLフラグをセット
 	public void setURL(String url) {
-		this.urlFlag = true; // URLフラグをセット
-		this.urlString = url; // URLをセット
+		if (urlString == null) {
+			this.urlFlag = true; // URLフラグをセット
+			this.urlString = url; // URLをセット
+		} else {
+			// エラー
+			System.out.println("URLが多いです");
+			System.exit(0);// 終了
+		}
 	}
 
 	// 指定されたURLにアクセスする
@@ -54,7 +73,7 @@ public class CurlRequest {
 		// URLがセットされていなければ終了
 		if (!urlFlag) {
 			System.out.println("URLがありません");
-			return;
+			System.exit(0); // 終了
 		}
 
 		HttpURLConnection urlConnection = null;
@@ -75,12 +94,26 @@ public class CurlRequest {
 			urlConnection.setRequestProperty("User-Agent", "jp");
 			// ヘッダーにAccept-Languageを設定する。
 			urlConnection.setRequestProperty("Accept-Language", Locale.getDefault().toString());
-			// HTTPのメソッドをGETに設定する。
-			urlConnection.setRequestMethod("GET");
-			// リクエストのボディ送信を許可しない
+			// リクエストのボディ送信を許可する
 			urlConnection.setDoOutput(true);
 			// レスポンスのボディ受信を許可する
 			urlConnection.setDoInput(true);
+
+			// ポストを送る時
+			if (this.postFlag) {
+				// POST受け取り
+				urlConnection.setRequestMethod("POST");
+				urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;");
+				OutputStreamWriter out = new OutputStreamWriter(urlConnection.getOutputStream());
+				// パラメータも送る時
+				if (this.paraFlag)
+					out.write(paraString);
+				out.close();
+			} else {
+				// HTTPのメソッドをGETに設定する。
+				urlConnection.setRequestMethod("GET");
+			}
+
 			// コネクションを開く
 			urlConnection.connect();
 			// レスポンスボディの読み出しを行う。
@@ -100,7 +133,6 @@ public class CurlRequest {
 				System.out.println("ヘッダー受け取り完了 ON");
 				// 追加
 				responseData = addHeader(responseData, header);
-
 			}
 
 			// ファイル作成
@@ -121,7 +153,6 @@ public class CurlRequest {
 		System.out.println("URL:" + urlString);
 		System.out.println("httpStatusCode:" + responseCode);
 		System.out.println("responseData\n" + responseData);
-
 	}
 
 	// ヘッダーをボディの先頭に付け足す
