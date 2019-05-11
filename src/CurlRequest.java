@@ -7,7 +7,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 public class CurlRequest {
 	private String urlString; // アクセスするURL
@@ -70,20 +72,36 @@ public class CurlRequest {
 			// レスポンスデータ読み取りタイムアウトを設定する。
 			urlConnection.setReadTimeout(100000);
 			// ヘッダーにUser-Agentを設定する。
-			urlConnection.setRequestProperty("User-Agent", "Android");
+			urlConnection.setRequestProperty("User-Agent", "jp");
 			// ヘッダーにAccept-Languageを設定する。
 			urlConnection.setRequestProperty("Accept-Language", Locale.getDefault().toString());
 			// HTTPのメソッドをGETに設定する。
 			urlConnection.setRequestMethod("GET");
 			// リクエストのボディ送信を許可しない
-			urlConnection.setDoOutput(false);
+			urlConnection.setDoOutput(true);
 			// レスポンスのボディ受信を許可する
 			urlConnection.setDoInput(true);
-			// ステップ4:コネクションを開く
+			// コネクションを開く
 			urlConnection.connect();
-			// ステップ6:レスポンスボディの読み出しを行う。
+			// レスポンスボディの読み出しを行う。
 			responseCode = urlConnection.getResponseCode();
 			responseData = convertToString(urlConnection.getInputStream());
+
+			// ヘッダ追加
+			if (this.headerFlag) {
+				Map headers = urlConnection.getHeaderFields();
+				Iterator headerIt = headers.keySet().iterator();
+				String header = null;
+				while (headerIt.hasNext()) {
+					String headerKey = (String) headerIt.next();
+					header += headerKey + "：" + headers.get(headerKey) + "\r\n";
+				}
+				// 表示
+				System.out.println("ヘッダー受け取り完了 ON");
+				// 追加
+				responseData = addHeader(responseData, header);
+
+			}
 
 			// ファイル作成
 			if (fileFlag)
@@ -97,11 +115,20 @@ public class CurlRequest {
 				urlConnection.disconnect();
 			}
 		}
-		// System.out.println("");
-		// System.out.println("URL:" + urlString);
-		// System.out.println("httpStatusCode:" + responseCode);
-		// System.out.println("responseData\n" + responseData);
 
+		// 表示
+		System.out.println("");
+		System.out.println("URL:" + urlString);
+		System.out.println("httpStatusCode:" + responseCode);
+		System.out.println("responseData\n" + responseData);
+
+	}
+
+	// ヘッダーをボディの先頭に付け足す
+	private String addHeader(String responseData, String header) {
+		StringBuilder data = new StringBuilder(responseData);
+		data.insert(0, header);
+		return data.toString();
 	}
 
 	// 受け取った内容をString型に変える
